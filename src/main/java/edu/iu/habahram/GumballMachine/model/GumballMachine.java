@@ -35,74 +35,90 @@ public class GumballMachine implements IGumballMachine {
 
     @Override
     public TransitionResult ejectQuarter() {
-        //TODO
         boolean succeeded = false;
         String message = "";
         if (state.equalsIgnoreCase(HAS_QUARTER)) {
-            message = "Ejecting quarter";
+            state = NO_QUARTER;
+            message = "Quarter returned";
             succeeded = true;
         } else if (state.equalsIgnoreCase(NO_QUARTER)) {
-            message = "No quarter to eject!";
+            message = "You haven't inserted a quarter";
         } else if (state.equalsIgnoreCase(SOLD_OUT)) {
-            message = "The machine is sold out";
+            message = "You can't eject, you haven't inserted a quarter yet";
         } else if (state.equalsIgnoreCase(SOLD)) {
-            message = "Ejecting";
-            succeeded = true;
+            message = "Sorry, you already turned the crank";
         }
         return new TransitionResult(succeeded, message, state, count);
     }
 
     @Override
     public TransitionResult turnCrank() {
-        //TODO
         boolean succeeded = false;
         String message = "";
-        String stateAfterAttempt = null;
+        String stateAfterTheAttempt = null;
         if (state.equalsIgnoreCase(HAS_QUARTER)) {
-            message = "turning crank";
             state = SOLD;
+            message = "You turned...";
+            succeeded = true;
             return dispense();
         } else if (state.equalsIgnoreCase(NO_QUARTER)) {
-            message = "No quarter";
+            message = "You turned but there's no quarter";
         } else if (state.equalsIgnoreCase(SOLD_OUT)) {
-            message = "The machine is sold out";
+            message = "You turned, but there are no gumballs";
         } else if (state.equalsIgnoreCase(SOLD)) {
-            message = "Turning twice doesn't get you another gumball";
+            message = "Turning twice doesn't get you another gumball!";
         }
-        stateAfterAttempt = state;
+        stateAfterTheAttempt = state;
         return new TransitionResult(succeeded, message, state, count);
     }
 
-
     @Override
-    public TransitionResult dispense() {
+    public TransitionResult refill(int countBalls) {
         boolean succeeded = false;
         String message = "";
-        String stateAfterAttempt = null;
-        if(state.equalsIgnoreCase(SOLD)){
-            message = "Gumball comes rolling out of the slot";
-            count = count - 1;
-            if (count == 0){
-                message = "Out of gumballs!";
-                state = SOLD_OUT;
-            } else {
-                state = NO_QUARTER;
-            }
+        if (state.equalsIgnoreCase(HAS_QUARTER)) {
+            message = "Machine doesn't need to be refilled";
+        } else if (state.equalsIgnoreCase(NO_QUARTER)) {
+            message = "Machine doesn't need to be refilled";
+        } else if (state.equalsIgnoreCase(SOLD_OUT)) {
+            message = "Machine refilled";
+            count = countBalls;
+            state = NO_QUARTER;
             succeeded = true;
-        } else if (state.equalsIgnoreCase(NO_QUARTER)){
-            message = "Pay first!";
-        } else if (state.equalsIgnoreCase(SOLD_OUT)){
-            message = "No gumball dispensed";
-        } else if (state.equalsIgnoreCase(HAS_QUARTER)){
-            message = "no gumball dispensed";
+        } else if (state.equalsIgnoreCase(SOLD)) {
+            message = "Machine doesn't need to be refilled";
         }
-        stateAfterAttempt = state;
         return new TransitionResult(succeeded, message, state, count);
     }
 
     @Override
     public void changeTheStateTo(GumballMachineState name) {
 
+    }
+
+    public TransitionResult dispense() {
+        boolean succeeded = false;
+        String message = "";
+        String stateAfterTheAttempt = null;
+        if (state.equalsIgnoreCase(HAS_QUARTER)) {
+            message = "No gumball dispensed";
+        } else if (state.equalsIgnoreCase(NO_QUARTER)) {
+            message = "You need to pay first";
+        } else if (state.equalsIgnoreCase(SOLD_OUT)) {
+            message = "No gumball dispensed";
+        } else if (state.equalsIgnoreCase(SOLD)) {
+            message = "A gumball comes rolling out the slot";
+            count = count - 1;
+            if (count == 0) {
+                message = "Oops, out of gumballs!";
+                state = SOLD_OUT;
+            } else {
+                state = NO_QUARTER;
+            }
+            succeeded = true;
+        }
+        stateAfterTheAttempt = state;
+        return new TransitionResult(succeeded, message, state, count);
     }
 
     @Override
@@ -118,6 +134,11 @@ public class GumballMachine implements IGumballMachine {
     @Override
     public void releaseBall() {
 
+    }
+
+    @Override
+    public void setCount(int balls) {
+        this.count = balls;
     }
 
 

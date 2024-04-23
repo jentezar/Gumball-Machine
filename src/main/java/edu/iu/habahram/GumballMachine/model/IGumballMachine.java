@@ -5,11 +5,13 @@ public interface IGumballMachine {
     TransitionResult ejectQuarter();
     TransitionResult turnCrank();
 
-    TransitionResult dispense();
+    TransitionResult refill(int balls);
 
     void changeTheStateTo(GumballMachineState name);
     Integer getCount();
     String getTheStateName();
 
     void releaseBall();
+
+    void setCount(int balls);
 }
